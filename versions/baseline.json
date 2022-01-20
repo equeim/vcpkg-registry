@@ -1,0 +1,8 @@
+{
+  "default": {
+    "hicolor-icon-theme": {
+      "baseline": "0.17",
+      "port-version": 0
+    }
+  }
+}
