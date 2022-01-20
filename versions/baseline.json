@@ -3,6 +3,10 @@
     "hicolor-icon-theme": {
       "baseline": "0.17",
       "port-version": 0
+    },
+    "kf5breezeicons": {
+      "baseline": "5.89.0",
+      "port-version": 0
     }
   }
 }
