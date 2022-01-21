@@ -1,10 +1,13 @@
 {
   "name": "kf5breezeicons",
   "version": "5.89.0",
+  "port-version": 1,
   "description": "Breeze-icons is a freedesktop.org compatible icon theme",
   "homepage": "https://github.com/KDE/breeze-icons",
   "dependencies": [
+    "hicolor-icon-theme",
     "ecm",
+    "qt5-base",
     {
       "name": "vcpkg-cmake",
       "host": true
