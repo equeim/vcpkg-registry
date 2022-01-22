@@ -21,6 +21,9 @@ vcpkg_extract_source_archive(
 	ARCHIVE "${ARCHIVE}"
 )
 
+# Prevent ECM from writing .clang-format in source directory
+file(TOUCH "${SOURCE_PATH}/.clang-format")
+
 vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
     OPTIONS
