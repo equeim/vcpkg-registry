@@ -1,6 +1,7 @@
 {
   "name": "hicolor-icon-theme",
   "version": "0.17",
+  "port-version": 1,
   "description": "This is the default fallback theme used by implementations of the icon theme specification",
   "homepage": "https://www.freedesktop.org/wiki/Software/icon-theme"
 }
