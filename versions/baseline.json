@@ -8,6 +8,10 @@
       "baseline": "5.89.0",
       "port-version": 2
     },
+    "kf5i18n": {
+      "baseline": "5.89.0",
+      "port-version": 1
+    },
     "qt5-tools": {
       "baseline": "5.15.5",
       "port-version": 0
