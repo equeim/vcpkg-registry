@@ -13,7 +13,7 @@
       "port-version": 1
     },
     "qt5-tools": {
-      "baseline": "5.15.6",
+      "baseline": "5.15.7",
       "port-version": 0
     }
   }
