@@ -1,12 +1,12 @@
-set(version 5.89.0)
-set(version_without_patch 5.89)
+set(version 5.98.0)
+set(version_without_patch 5.98)
 
 if (VCPKG_TARGET_IS_WINDOWS)
 	set(archive_extension zip)
-	set(archive_sha512 9cc255cb960133b8fc025def0135f1ea6a7de8d39a3fd9314fa0db7e144ac5443e94e1726b3d859c338e5b263ffea57e48c85674bc68ef61799966e977556283)
+	set(archive_sha512 8d7ecf951258ddfe77f7cc4dd798eabfcaeee40bcfb020656ad7fb036c999a9305a5aaf33ac422609a8dc225d4da7bd54bb2b7a3621efd08405b687204c78a90)
 else()
 	set(archive_extension tar.xz)
-	set(archive_sha512 8aeade18fde4c45df10a396987473220741c4dad736f2077f7075ebdc4ca4ed3cdb8975c5a9604a2f56b81b7cb4bf53117e33f7faff4e5b3b6293fefe8cccc70)
+	set(archive_sha512 3983baac054b576b3c8a4172ef07b4422a7ebafb9b624194ad40c11a37d111c2981df87e001b42196ae1e9ac4479c0b44e36838bbba53e19874e1a1e95e5894c)
 endif()
 
 vcpkg_download_distfile(
@@ -21,8 +21,8 @@ vcpkg_extract_source_archive(
 	ARCHIVE "${ARCHIVE}"
 )
 
-# Prevent ECM from writing .clang-format in source directory
-file(TOUCH "${SOURCE_PATH}/.clang-format")
+# Prevent KDEClangFormat from writing to source effectively blocking parallel configure
+file(WRITE "${SOURCE_PATH}/.clang-format" "DisableFormat: true\nSortIncludes: false\n")
 
 vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
