@@ -1,6 +1,6 @@
 {
   "name": "qt5-tools",
-  "version-string": "5.15.7",
+  "version-string": "5.15.8",
   "port-version": 0,
   "description": "Qt5 Tools Module; Includes deployment tools and helpers, Qt Designer, Assistant, and other applications",
   "dependencies": [
