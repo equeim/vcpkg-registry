@@ -15,6 +15,10 @@
     "qtbase-tremotesf-android": {
       "baseline": "6.4.2",
       "port-version": 0
+    },
+    "libpsl": {
+      "baseline": "0.21.2",
+      "port-version": 0
     }
   }
 }
