@@ -16,18 +16,10 @@ elseif (LIBPSL_RUNTIME_LIBIDN2)
     set(LIBPSL_RUNTIME "libidn2")
 endif()
 
-set(LIBPSL_VERSION "0.21.2")
-vcpkg_download_distfile(ARCHIVE
-    URLS "https://github.com/rockdaboot/libpsl/releases/download/${LIBPSL_VERSION}/libpsl-${LIBPSL_VERSION}.tar.gz"
-    FILENAME "libpsl-${LIBPSL_VERSION}.tar.gz"
-    SHA512 f1df72220bf4391d4701007100b0df66c833a2cbcb7481c9d13f0b9e0cad3b66d2d15d4b976e5bad60d2ad1540355112fa1acb07aa925c241d2d7cd20681c71d
-)
-vcpkg_extract_source_archive_ex(
+vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
-    ARCHIVE "${ARCHIVE}"
-    REF "${LIBPSL_VERSION}"
-    PATCHES
-        fix-windows-build.patch
+    REPO rockdaboot/libpsl
+    REF 477c58298f8c4f5aeff3c223e1904d978635e353
 )
 
 vcpkg_configure_meson(
@@ -36,6 +28,7 @@ vcpkg_configure_meson(
         -Druntime=${LIBPSL_RUNTIME}
         -Dbuiltin=true
         -Ddocs=false
+        -Dtests=false
 )
 vcpkg_install_meson()
 vcpkg_fixup_pkgconfig()
