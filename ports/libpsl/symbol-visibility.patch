@@ -1,0 +1,40 @@
+commit 319d362efefba8c099d2a68a8fff1a1836fb796c
+Author: Eli Schwartz <eschwartz93@gmail.com>
+Date:   Mon Feb 13 17:42:04 2023 -0500
+
+    meson: add support for symbol visibility
+    
+    libpsl.h can set up a PSL_API macro handling cross-platform symbol
+    hiding/exporting, which depends on indicating that:
+    
+    - we're currently building the library
+    - the compiler supports visibility attributes
+    
+    This avoids leaking symbols and lets the compiler optimize calls.
+
+diff --git a/meson.build b/meson.build
+index 4492354..27808d3 100644
+--- a/meson.build
++++ b/meson.build
+@@ -100,6 +100,9 @@ config.set('HAVE_STRNDUP', cc.has_function('strndup'))
+ config.set('HAVE_CLOCK_GETTIME', cc.has_function('clock_gettime'))
+ config.set('HAVE_FMEMOPEN', cc.has_function('fmemopen'))
+ config.set('HAVE_NL_LANGINFO', cc.has_function('nl_langinfo'))
++if cc.has_function_attribute('visibility')
++  config.set('HAVE_VISIBILITY', 1)
++endif
+ configure_file(output : 'config.h', configuration : config)
+ 
+ configinc = include_directories('.')
+diff --git a/src/meson.build b/src/meson.build
+index 5cf0a5a..92366f2 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -38,6 +38,7 @@ libpsl = library('psl', sources, suffixes_dafsa_h,
+   include_directories : [configinc, includedir],
+   c_args : cargs,
+   dependencies : [libidn2_dep, libidn_dep, libicu_dep, libunistring, networking_deps, libiconv_dep],
++  gnu_symbol_visibility: 'hidden',
+   version: library_version,
+   install: true,
+   link_language : link_language

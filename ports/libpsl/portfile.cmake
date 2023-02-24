@@ -28,6 +28,8 @@ vcpkg_extract_source_archive_ex(
     REF "${LIBPSL_VERSION}"
     PATCHES
         fix-windows-build.patch
+        icu-dependency.patch
+        symbol-visibility.patch
 )
 
 vcpkg_configure_meson(
