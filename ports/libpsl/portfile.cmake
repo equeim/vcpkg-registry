@@ -27,9 +27,8 @@ vcpkg_extract_source_archive_ex(
     ARCHIVE "${ARCHIVE}"
     REF "${LIBPSL_VERSION}"
     PATCHES
-        fix-windows-build.patch
-        icu-dependency.patch
-        symbol-visibility.patch
+        0.21.2-10-g477c582.patch
+        strcasecmp.patch
 )
 
 vcpkg_configure_meson(
@@ -38,6 +37,7 @@ vcpkg_configure_meson(
         -Druntime=${LIBPSL_RUNTIME}
         -Dbuiltin=true
         -Ddocs=false
+        -Dtests=false
 )
 vcpkg_install_meson()
 vcpkg_fixup_pkgconfig()

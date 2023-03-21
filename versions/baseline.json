@@ -18,7 +18,7 @@
     },
     "libpsl": {
       "baseline": "0.21.2",
-      "port-version": 2
+      "port-version": 3
     }
   }
 }
