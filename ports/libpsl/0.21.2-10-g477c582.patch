@@ -1,32 +1,3 @@
-diff --git a/README.md b/README.md
-index e782f4b..65c3799 100644
---- a/README.md
-+++ b/README.md
-@@ -129,15 +129,19 @@ Building from git
- 
- You should have python2.7+ installed.
- 
--Download project and prepare sources with
-+Download project with
-+
-+		git clone --recursive https://github.com/rockdaboot/libpsl
-+		cd libpsl
-+
-+Build with GNU autotools
- 
--		git clone https://github.com/rockdaboot/libpsl
- 		./autogen.sh
- 		./configure
- 		make
- 		make check
- 
--If you prefer a `meson` build
-+Build with `meson`
- 
- 		meson builddir
- 		ninja -C builddir
-diff --git a/fuzz/meson.build b/fuzz/meson.build
-index 19e3dd3..25dc7b3 100644
 --- a/fuzz/meson.build
 +++ b/fuzz/meson.build
 @@ -15,6 +15,7 @@ foreach test_case : ['fuzzer', 'load_fuzzer', 'load_dafsa_fuzzer']
@@ -37,96 +8,6 @@ index 19e3dd3..25dc7b3 100644
      c_args : fuzzer_cargs,
      include_directories : configinc,
      link_language : link_language,
-diff --git a/m4/visibility.m4 b/m4/visibility.m4
-new file mode 100644
-index 0000000..f0468e8
---- /dev/null
-+++ b/m4/visibility.m4
-@@ -0,0 +1,82 @@
-+# visibility.m4 serial 8
-+dnl Copyright (C) 2005, 2008, 2010-2023 Free Software Foundation, Inc.
-+dnl This file is free software; the Free Software Foundation
-+dnl gives unlimited permission to copy and/or distribute it,
-+dnl with or without modifications, as long as this notice is preserved.
-+
-+dnl From Bruno Haible.
-+
-+dnl Tests whether the compiler supports the command-line option
-+dnl -fvisibility=hidden and the function and variable attributes
-+dnl __attribute__((__visibility__("hidden"))) and
-+dnl __attribute__((__visibility__("default"))).
-+dnl Does *not* test for __visibility__("protected") - which has tricky
-+dnl semantics (see the 'vismain' test in glibc) and does not exist e.g. on
-+dnl Mac OS X.
-+dnl Does *not* test for __visibility__("internal") - which has processor
-+dnl dependent semantics.
-+dnl Does *not* test for #pragma GCC visibility push(hidden) - which is
-+dnl "really only recommended for legacy code".
-+dnl Set the variable CFLAG_VISIBILITY.
-+dnl Defines and sets the variable HAVE_VISIBILITY.
-+
-+AC_DEFUN([gl_VISIBILITY],
-+[
-+  AC_REQUIRE([AC_PROG_CC])
-+  CFLAG_VISIBILITY=
-+  HAVE_VISIBILITY=0
-+  if test -n "$GCC"; then
-+    dnl First, check whether -Werror can be added to the command line, or
-+    dnl whether it leads to an error because of some other option that the
-+    dnl user has put into $CC $CFLAGS $CPPFLAGS.
-+    AC_CACHE_CHECK([whether the -Werror option is usable],
-+      [gl_cv_cc_vis_werror],
-+      [gl_save_CFLAGS="$CFLAGS"
-+       CFLAGS="$CFLAGS -Werror"
-+       AC_COMPILE_IFELSE(
-+         [AC_LANG_PROGRAM([[]], [[]])],
-+         [gl_cv_cc_vis_werror=yes],
-+         [gl_cv_cc_vis_werror=no])
-+       CFLAGS="$gl_save_CFLAGS"
-+      ])
-+    dnl Now check whether visibility declarations are supported.
-+    AC_CACHE_CHECK([for simple visibility declarations],
-+      [gl_cv_cc_visibility],
-+      [gl_save_CFLAGS="$CFLAGS"
-+       CFLAGS="$CFLAGS -fvisibility=hidden"
-+       dnl We use the option -Werror and a function dummyfunc, because on some
-+       dnl platforms (Cygwin 1.7) the use of -fvisibility triggers a warning
-+       dnl "visibility attribute not supported in this configuration; ignored"
-+       dnl at the first function definition in every compilation unit, and we
-+       dnl don't want to use the option in this case.
-+       if test $gl_cv_cc_vis_werror = yes; then
-+         CFLAGS="$CFLAGS -Werror"
-+       fi
-+       AC_COMPILE_IFELSE(
-+         [AC_LANG_PROGRAM(
-+            [[extern __attribute__((__visibility__("hidden"))) int hiddenvar;
-+              extern __attribute__((__visibility__("default"))) int exportedvar;
-+              extern __attribute__((__visibility__("hidden"))) int hiddenfunc (void);
-+              extern __attribute__((__visibility__("default"))) int exportedfunc (void);
-+              void dummyfunc (void);
-+              int hiddenvar;
-+              int exportedvar;
-+              int hiddenfunc (void) { return 51; }
-+              int exportedfunc (void) { return 1225736919; }
-+              void dummyfunc (void) {}
-+            ]],
-+            [[]])],
-+         [gl_cv_cc_visibility=yes],
-+         [gl_cv_cc_visibility=no])
-+       CFLAGS="$gl_save_CFLAGS"
-+      ])
-+    if test $gl_cv_cc_visibility = yes; then
-+      CFLAG_VISIBILITY="-fvisibility=hidden"
-+      HAVE_VISIBILITY=1
-+    fi
-+  fi
-+  AC_SUBST([CFLAG_VISIBILITY])
-+  AC_SUBST([HAVE_VISIBILITY])
-+  AC_DEFINE_UNQUOTED([HAVE_VISIBILITY], [$HAVE_VISIBILITY],
-+    [Define to 1 or 0, depending whether the compiler supports simple visibility declarations.])
-+])
-diff --git a/meson.build b/meson.build
-index 169d00e..27808d3 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -40,17 +40,9 @@ if ['libidn2', 'auto'].contains(enable_runtime)
@@ -171,8 +52,6 @@ index 169d00e..27808d3 100644
 +  subdir('fuzz')
 +endif
  subdir(join_paths('docs', 'libpsl'))
-diff --git a/meson_options.txt b/meson_options.txt
-index e9d6a23..d66f256 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
 @@ -17,3 +17,6 @@ option('psl_testfile', type : 'string', value : '',
@@ -182,51 +61,6 @@ index e9d6a23..d66f256 100644
 +
 +option('tests', type: 'boolean', value: true,
 +  description: 'Build the tests and fuzzers')
-diff --git a/msvc/detectenv-msvc.mak b/msvc/detectenv-msvc.mak
-index d29d581..4a58d70 100644
---- a/msvc/detectenv-msvc.mak
-+++ b/msvc/detectenv-msvc.mak
-@@ -68,6 +68,8 @@ _HASH=^#
-     && ![echo PLAT=Win32 >> vercl.x] \
-     && ![echo $(_HASH)elif defined(_M_AMD64) >> vercl.x] \
-     && ![echo PLAT=x64 >> vercl.x] \
-+    && ![echo $(_HASH)elif defined(_M_ARM64) >> vercl.x] \
-+    && ![echo PLAT=arm64 >> vercl.x] \
-     && ![echo $(_HASH)endif >> vercl.x] \
-     && ![cl -nologo -TC -P vercl.x $(ERRNUL)]
- !include vercl.i
-@@ -91,8 +93,10 @@ VSVER = 12
- VSVER = 14
- !elseif $(VCVERSION) > 1909 && $(VCVERSION) < 1920
- VSVER = 15
--!elseif $(VCVERSION) > 1919 && $(VCVERSION) < 2000
-+!elseif $(VCVERSION) > 1919 && $(VCVERSION) < 1930
- VSVER = 16
-+!elseif $(VCVERSION) > 1929 && $(VCVERSION) < 2000
-+VSVER = 17
- !else
- VSVER = 0
- !endif
-@@ -100,7 +104,7 @@ VSVER = 0
- !if "$(VSVER)" == "0"
- MSG = ^
- This NMake Makefile set supports Visual Studio^
--9 (2008) through 16 (2019).  Your Visual Studio^
-+9 (2008) through 17 (2022).  Your Visual Studio^
- version is not supported.
- !error $(MSG)
- !elseif $(VSVER) < 15
-@@ -132,6 +136,8 @@ LDFLAGS_ARCH = /machine:x64
- !elseif "$(PLAT)" == "arm"
- LDFLAGS_ARCH = /machine:arm
- CFLAGS_ADD = $(CFLAGS_ADD) /DWINAPI_FAMILY=3
-+!elseif "$(PLAT)" == "arm64"
-+LDFLAGS_ARCH = /machine:arm64
- !else
- LDFLAGS_ARCH = /machine:x86
- !endif
-diff --git a/src/meson.build b/src/meson.build
-index 5cf0a5a..92366f2 100644
 --- a/src/meson.build
 +++ b/src/meson.build
 @@ -38,6 +38,7 @@ libpsl = library('psl', sources, suffixes_dafsa_h,
@@ -237,8 +71,6 @@ index 5cf0a5a..92366f2 100644
    version: library_version,
    install: true,
    link_language : link_language
-diff --git a/tests/meson.build b/tests/meson.build
-index d932166..c2381af 100644
 --- a/tests/meson.build
 +++ b/tests/meson.build
 @@ -1,11 +1,13 @@
@@ -263,8 +95,6 @@ index d932166..c2381af 100644
      c_args : tests_cargs,
      link_with : libpsl,
      include_directories : configinc,
-diff --git a/tools/psl.c b/tools/psl.c
-index 95d8b65..ed94d5c 100644
 --- a/tools/psl.c
 +++ b/tools/psl.c
 @@ -38,6 +38,14 @@
