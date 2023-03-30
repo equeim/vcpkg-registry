@@ -64,6 +64,28 @@ set(ANDROID_SDK_ROOT "$ENV{ANDROID_SDK_HOME}")
 # Following is ours
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
+file(READ "${VCPKG_ROOT_DIR}/ports/qtbase/vcpkg.json" qtbase-json)
+string(JSON qtbase-version GET "${qtbase-json}" version)
+string(JSON qtbase-port-version ERROR_VARIABLE qtbase-port-version-error GET "${qtbase-json}" port-version)
+if(NOT qtbase-port-version-error STREQUAL "NOTFOUND")
+    set(qtbase-port-version "0")
+endif()
+set(qtbase-full-version "${qtbase-version}#${qtbase-port-version}")
+message("qtbase version is ${qtbase-full-version}")
+
+file(READ "${CMAKE_CURRENT_LIST_DIR}/vcpkg.json" qtbase-tremotesf-android-json)
+string(JSON qtbase-tremotesf-android-version GET "${qtbase-tremotesf-android-json}" version)
+string(JSON qtbase-tremotesf-android-port-version ERROR_VARIABLE qtbase-tremotesf-android-port-version-error GET "${qtbase-tremotesf-android-json}" port-version)
+if(NOT qtbase-tremotesf-android-port-version-error STREQUAL "NOTFOUND")
+    set(qtbase-tremotesf-android-port-version "0")
+endif()
+set(qtbase-tremotesf-android-full-version "${qtbase-tremotesf-android-version}#${qtbase-tremotesf-android-port-version}")
+message("qtbase-tremotesf-android version is ${qtbase-tremotesf-android-full-version}")
+
+if(NOT qtbase-full-version STREQUAL qtbase-tremotesf-android-full-version)
+    message(FATAL_ERROR "Versions must be the same")
+endif()
+
 list(TRANSFORM QTBASE_PATCHES PREPEND "${VCPKG_ROOT_DIR}/ports/qtbase/")
 
 set(BACKUP_PORT ${PORT})
