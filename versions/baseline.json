@@ -9,7 +9,7 @@
       "port-version": 0
     },
     "qt5-tools": {
-      "baseline": "5.15.8",
+      "baseline": "5.15.9",
       "port-version": 0
     },
     "qtbase-tremotesf-android": {
