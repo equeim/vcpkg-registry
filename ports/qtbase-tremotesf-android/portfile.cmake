@@ -18,15 +18,15 @@ include("${VCPKG_ROOT_DIR}/ports/qtbase/cmake/qt_install_submodule.cmake")
 
 set(QTBASE_PATCHES
         allow_outside_prefix.patch
-        clang-cl_source_location.patch
         config_install.patch
         fix_cmake_build.patch
         harfbuzz.patch
         fix_egl.patch
         fix_egl_2.patch
-        clang-cl_QGADGET_fix.diff # Upstream is still figuring out if this is a compiler bug or not.
         installed_dir.patch
         GLIB2-static.patch # alternative is to force pkg-config
+        clang-cl_source_location.patch
+        clang-cl_QGADGET_fix.diff
         )
 
 if(VCPKG_TARGET_IS_WINDOWS AND NOT VCPKG_TARGET_IS_MINGW)
@@ -54,7 +54,12 @@ set(TOOL_NAMES
     qtpaths
     qtpaths6
     windeployqt
+    windeployqt6
     macdeployqt
+    macdeployqt6
+    androiddeployqt6
+    syncqt
+    tracepointgen
 )
 
 set(VCPKG_LIBRARY_LINKAGE dynamic)
@@ -73,17 +78,10 @@ endif()
 set(qtbase-full-version "${qtbase-version}#${qtbase-port-version}")
 message("qtbase version is ${qtbase-full-version}")
 
-file(READ "${CMAKE_CURRENT_LIST_DIR}/vcpkg.json" qtbase-tremotesf-android-json)
-string(JSON qtbase-tremotesf-android-version GET "${qtbase-tremotesf-android-json}" version)
-string(JSON qtbase-tremotesf-android-port-version ERROR_VARIABLE qtbase-tremotesf-android-port-version-error GET "${qtbase-tremotesf-android-json}" port-version)
-if(NOT qtbase-tremotesf-android-port-version-error STREQUAL "NOTFOUND")
-    set(qtbase-tremotesf-android-port-version "0")
-endif()
-set(qtbase-tremotesf-android-full-version "${qtbase-tremotesf-android-version}#${qtbase-tremotesf-android-port-version}")
-message("qtbase-tremotesf-android version is ${qtbase-tremotesf-android-full-version}")
+set(qtbase-compatible-version "6.5.0#0")
 
-if(NOT qtbase-full-version STREQUAL qtbase-tremotesf-android-full-version)
-    message(FATAL_ERROR "Versions must be the same")
+if(NOT qtbase-full-version STREQUAL qtbase-compatible-version)
+    message(FATAL_ERROR "qtbase version must be ${qtbase-compatible-version}")
 endif()
 
 list(TRANSFORM QTBASE_PATCHES PREPEND "${VCPKG_ROOT_DIR}/ports/qtbase/")
@@ -140,6 +138,7 @@ qt_install_submodule(
         -DFEATURE_process=OFF
         -DFEATURE_processenvironment=OFF
         -DFEATURE_proxymodel=OFF
+        -DFEATURE_publicsuffix_qt=ON
         -DFEATURE_publicsuffix_system=OFF
         -DFEATURE_qmake=OFF
         -DFEATURE_sctp=OFF
@@ -159,7 +158,7 @@ qt_install_submodule(
         -DFEATURE_temporaryfile=OFF
         -DFEATURE_testlib=OFF
         -DFEATURE_timezone=OFF
-        -DFEATURE_topleveldomain=OFF
+        -DFEATURE_topleveldomain=ON
         -DFEATURE_translation=OFF
         -DFEATURE_transposeproxymodel=OFF
         -DFEATURE_udpsocket=OFF
@@ -176,6 +175,8 @@ file(RENAME "${CURRENT_PACKAGES_DIR}/share/qtbase" "${CURRENT_PACKAGES_DIR}/shar
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 # Following is copied from qtbase's portfile.cmake
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+file(CONFIGURE OUTPUT "${CURRENT_PACKAGES_DIR}/share/${PORT}/port_status.cmake" CONTENT "set(qtbase_with_icu OFF)\n")
 
 set(other_files qt-cmake
                  qt-cmake-private
@@ -198,6 +199,7 @@ list(APPEND other_files
                 target_qt.conf
                 qt-cmake-private-install.cmake
                 qt-testrunner.py
+                sanitizer-testrunner.py
                 )
 
 foreach(_config debug release)
@@ -307,6 +309,12 @@ file(READ "${hostinfofile}" _contents)
 string(REPLACE [[set(QT6_HOST_INFO_LIBEXECDIR "bin")]] [[set(QT6_HOST_INFO_LIBEXECDIR "tools/Qt6/bin")]] _contents "${_contents}")
 string(REPLACE [[set(QT6_HOST_INFO_BINDIR "bin")]] [[set(QT6_HOST_INFO_BINDIR "tools/Qt6/bin")]] _contents "${_contents}")
 file(WRITE "${hostinfofile}" "${_contents}")
+
+if(NOT VCPKG_CROSSCOMPILING OR EXISTS "${CURRENT_PACKAGES_DIR}/share/Qt6CoreTools/Qt6CoreToolsAdditionalTargetInfo.cmake")
+    vcpkg_replace_string("${CURRENT_PACKAGES_DIR}/share/Qt6CoreTools/Qt6CoreToolsAdditionalTargetInfo.cmake"
+                         "PACKAGE_PREFIX_DIR}/bin/syncqt"
+                         "PACKAGE_PREFIX_DIR}/tools/Qt6/bin/syncqt")
+endif()
 
 set(configfile "${CURRENT_PACKAGES_DIR}/share/Qt6CoreTools/Qt6CoreToolsTargets-debug.cmake")
 if(EXISTS "${configfile}")
