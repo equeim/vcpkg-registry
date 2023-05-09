@@ -93,6 +93,8 @@ qt_install_submodule(
         ${QTBASE_PATCHES}
         # tremotesf-android patches
         qopensslbackend-static.patch
+        fix-lld-linking.patch
+        fix-elf-version-test.patch
     TOOL_NAMES ${TOOL_NAMES}
     CONFIGURE_OPTIONS
         # From qtbase's portfile.cmake

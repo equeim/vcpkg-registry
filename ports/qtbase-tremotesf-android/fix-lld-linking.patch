@@ -1,0 +1,116 @@
+From 8f8be55c155edcfbec8b798d4eb7e084ae88bc88 Mon Sep 17 00:00:00 2001
+From: Bernhard Rosenkränzer <bero@lindev.ch>
+Date: Sat, 25 Feb 2023 19:10:06 +0100
+Subject: [PATCH] CMake: Fix linkage with lld 16.0
+
+lld 16.0 is more picky about symbol versioning than previous versions
+(and other linkers such as ld.bfd, gold or mold).
+It now errors out if a symbol is versioned but not defined
+(see 8796677de8900dc154aef45f8620c3f987a40291).
+
+Outside of detecting support for symbol versioning (fixed by 462832),
+this causes linking Qt6 libraries other than Qt6Core to fail because
+their linker scripts try to add versioning to qt_version_tag, which is
+defined in Qt6Core rather than the library being linked.
+
+The obvious (and working) fix is to version qt_version_tag only where it is
+defined (Qt6Core), but this is not what the original intent seems to be.
+
+Task-number: QTBUG-111514
+Change-Id: I963d417befb0f6b2260c57f059eeda1fe79200c9
+Reviewed-by: Alexandru Croitor <alexandru.croitor@qt.io>
+---
+
+diff --git a/cmake/QtFlagHandlingHelpers.cmake b/cmake/QtFlagHandlingHelpers.cmake
+index d859732..8061745 100644
+--- a/cmake/QtFlagHandlingHelpers.cmake
++++ b/cmake/QtFlagHandlingHelpers.cmake
+@@ -33,22 +33,15 @@
+         endif()
+         string(APPEND contents "};\n")
+         set(current "Qt_${PROJECT_VERSION_MAJOR}")
+-        if (QT_NAMESPACE STREQUAL "")
+-            set(tag_symbol "qt_version_tag")
+-        else()
+-            set(tag_symbol "qt_version_tag_${QT_NAMESPACE}")
+-        endif()
+         string(APPEND contents "${current} { *; };\n")
+ 
+-        foreach(minor_version RANGE ${PROJECT_VERSION_MINOR})
+-            set(previous "${current}")
+-            set(current "Qt_${PROJECT_VERSION_MAJOR}.${minor_version}")
+-            if (minor_version EQUAL ${PROJECT_VERSION_MINOR})
+-                string(APPEND contents "${current} { ${tag_symbol}; } ${previous};\n")
+-            else()
+-                string(APPEND contents "${current} {} ${previous};\n")
+-            endif()
+-        endforeach()
++        get_target_property(type ${target} TYPE)
++        if(NOT target_type STREQUAL "INTERFACE_LIBRARY")
++            set(property_genex "$<TARGET_PROPERTY:${target},_qt_extra_linker_script_content>")
++            set(check_genex "$<BOOL:${property_genex}>")
++            string(APPEND contents
++                "$<${check_genex}:${property_genex}>")
++        endif()
+ 
+         set(infile "${CMAKE_CURRENT_BINARY_DIR}/${target}.version.in")
+         set(outfile "${CMAKE_CURRENT_BINARY_DIR}/${target}.version")
+diff --git a/cmake/QtTargetHelpers.cmake b/cmake/QtTargetHelpers.cmake
+index 7aae145..69848c9 100644
+--- a/cmake/QtTargetHelpers.cmake
++++ b/cmake/QtTargetHelpers.cmake
+@@ -14,6 +14,8 @@
+ #     module, these files will raise a warning at configure time if the condition is not met.
+ #   COMPILE_FLAGS
+ #     Custom compilation flags.
++#   EXTRA_LINKER_SCRIPT_CONTENT
++#     Extra content that should be appended to a target linker script. Applicable for ld only.
+ #   NO_PCH_SOURCES
+ #     Skip the specified source files by PRECOMPILE_HEADERS feature.
+ function(qt_internal_extend_target target)
+@@ -40,6 +42,7 @@
+     )
+     set(single_args
+         PRECOMPILED_HEADER
++        EXTRA_LINKER_SCRIPT_CONTENT
+     )
+     set(multi_args
+         ${__default_public_args}
+@@ -241,6 +244,10 @@
+             ${sources_property} "${arg_CONDITION_INDEPENDENT_SOURCES}")
+     endif()
+ 
++    if(arg_EXTRA_LINKER_SCRIPT_CONTENT)
++        set_target_properties(${target} PROPERTIES
++            _qt_extra_linker_script_content "${arg_EXTRA_LINKER_SCRIPT_CONTENT}")
++    endif()
+ endfunction()
+ 
+ function(qt_is_imported_target target out_var)
+diff --git a/src/corelib/CMakeLists.txt b/src/corelib/CMakeLists.txt
+index aeea45e..3d3c26a 100644
+--- a/src/corelib/CMakeLists.txt
++++ b/src/corelib/CMakeLists.txt
+@@ -1392,3 +1392,22 @@
+         DESTINATION "${dsym_script_install_dir}"
+     )
+ endif()
++
++set(linker_script_contents "")
++if (QT_NAMESPACE STREQUAL "")
++    set(tag_symbol "qt_version_tag")
++else()
++    set(tag_symbol "qt_version_tag_${QT_NAMESPACE}")
++endif()
++foreach(minor_version RANGE ${PROJECT_VERSION_MINOR})
++    set(previous "${current}")
++    set(current "Qt_${PROJECT_VERSION_MAJOR}.${minor_version}")
++    if (minor_version EQUAL ${PROJECT_VERSION_MINOR})
++        string(APPEND linker_script_contents "${current} { ${tag_symbol}; } ${previous};\n")
++    else()
++        string(APPEND linker_script_contents "${current} {} ${previous};\n")
++    endif()
++endforeach()
++qt_internal_extend_target(Core
++    EXTRA_LINKER_SCRIPT_CONTENT "${linker_script_contents}"
++)
