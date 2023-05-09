@@ -78,7 +78,7 @@ endif()
 set(qtbase-full-version "${qtbase-version}#${qtbase-port-version}")
 message("qtbase version is ${qtbase-full-version}")
 
-set(qtbase-compatible-version "6.5.0#0")
+set(qtbase-compatible-version "6.5.0#2")
 
 if(NOT qtbase-full-version STREQUAL qtbase-compatible-version)
     message(FATAL_ERROR "qtbase version must be ${qtbase-compatible-version}")
