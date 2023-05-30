@@ -1,23 +1,11 @@
 {
   "default": {
-    "hicolor-icon-theme": {
-      "baseline": "0.17",
-      "port-version": 1
-    },
-    "kf5breezeicons": {
-      "baseline": "5.98.0",
-      "port-version": 0
-    },
     "qt5-tools": {
       "baseline": "5.15.9",
       "port-version": 0
     },
     "qtbase-tremotesf-android": {
       "baseline": "6.5.0",
-      "port-version": 4
-    },
-    "libpsl": {
-      "baseline": "0.21.2",
       "port-version": 4
     }
   }
