@@ -78,7 +78,7 @@ endif()
 set(qtbase-full-version "${qtbase-version}#${qtbase-port-version}")
 message("qtbase version is ${qtbase-full-version}")
 
-set(qtbase-compatible-version "6.5.0#2")
+set(qtbase-compatible-version "6.5.1#0")
 
 if(NOT qtbase-full-version STREQUAL qtbase-compatible-version)
     message(FATAL_ERROR "qtbase version must be ${qtbase-compatible-version}")
@@ -93,8 +93,9 @@ qt_install_submodule(
         ${QTBASE_PATCHES}
         # tremotesf-android patches
         qopensslbackend-static.patch
-        fix-lld-linking.patch
-        fix-elf-version-test.patch
+        0001-CMake-Fix-linkage-with-lld-16.0.patch
+        0002-Don-t-run-version-script-test-when-its-result-won-t-.patch
+        0003-Fix-version-script-test.patch
     TOOL_NAMES ${TOOL_NAMES}
     CONFIGURE_OPTIONS
         # From qtbase's portfile.cmake
@@ -339,3 +340,19 @@ endif()
 if(VCPKG_CROSSCOMPILING)
     vcpkg_replace_string("${CURRENT_PACKAGES_DIR}/share/Qt6/Qt6Dependencies.cmake" "${CURRENT_HOST_INSTALLED_DIR}" "\${CMAKE_CURRENT_LIST_DIR}/../../../${HOST_TRIPLET}")
 endif()
+
+# The following pattern exists in qt-cmake scripts, but is still relocatable, so disable the absolute paths check.
+# warning: There should be no absolute paths, such as the following, in an installed package:
+# Absolute paths were found in the following files:
+#     packages/qtbase_x64-linux/tools/Qt6/bin/qt-cmake-private
+#     packages/qtbase_x64-linux/tools/Qt6/bin/debug/qt-cmake-private
+#     packages/qtbase_x64-linux/tools/Qt6/bin/debug/qt-cmake
+#     packages/qtbase_x64-linux/tools/Qt6/bin/qt-cmake
+# 
+# # Try to use original cmake, otherwise to make it relocatable, use any cmake found in PATH.
+# original_cmake_path="/home/bion/vcpkg/downloads/tools/cmake-3.25.1-linux/cmake-3.25.1-linux-x86_64/bin/cmake"
+# cmake_path=$original_cmake_path
+# if ! test -f "$cmake_path"; then
+#     cmake_path="cmake"
+# fi
+set(VCPKG_POLICY_SKIP_ABSOLUTE_PATHS_CHECK enabled)

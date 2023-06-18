@@ -1,3 +1,30 @@
+From 8f8be55c155edcfbec8b798d4eb7e084ae88bc88 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Bernhard=20Rosenkr=C3=A4nzer?= <bero@lindev.ch>
+Date: Sat, 25 Feb 2023 19:10:06 +0100
+Subject: [PATCH] CMake: Fix linkage with lld 16.0
+
+lld 16.0 is more picky about symbol versioning than previous versions
+(and other linkers such as ld.bfd, gold or mold).
+It now errors out if a symbol is versioned but not defined
+(see 8796677de8900dc154aef45f8620c3f987a40291).
+
+Outside of detecting support for symbol versioning (fixed by 462832),
+this causes linking Qt6 libraries other than Qt6Core to fail because
+their linker scripts try to add versioning to qt_version_tag, which is
+defined in Qt6Core rather than the library being linked.
+
+The obvious (and working) fix is to version qt_version_tag only where it is
+defined (Qt6Core), but this is not what the original intent seems to be.
+
+Task-number: QTBUG-111514
+Change-Id: I963d417befb0f6b2260c57f059eeda1fe79200c9
+Reviewed-by: Alexandru Croitor <alexandru.croitor@qt.io>
+---
+ cmake/QtFlagHandlingHelpers.cmake | 21 +++++++--------------
+ cmake/QtTargetHelpers.cmake       |  7 +++++++
+ src/corelib/CMakeLists.txt        | 19 +++++++++++++++++++
+ 3 files changed, 33 insertions(+), 14 deletions(-)
+
 diff --git a/cmake/QtFlagHandlingHelpers.cmake b/cmake/QtFlagHandlingHelpers.cmake
 index d8597326cc..806174521d 100644
 --- a/cmake/QtFlagHandlingHelpers.cmake
@@ -33,7 +60,7 @@ index d8597326cc..806174521d 100644
          set(infile "${CMAKE_CURRENT_BINARY_DIR}/${target}.version.in")
          set(outfile "${CMAKE_CURRENT_BINARY_DIR}/${target}.version")
 diff --git a/cmake/QtTargetHelpers.cmake b/cmake/QtTargetHelpers.cmake
-index c712731f11..4d2072164e 100644
+index 7aae145e87..69848c94a9 100644
 --- a/cmake/QtTargetHelpers.cmake
 +++ b/cmake/QtTargetHelpers.cmake
 @@ -14,6 +14,8 @@
@@ -45,7 +72,7 @@ index c712731f11..4d2072164e 100644
  #   NO_PCH_SOURCES
  #     Skip the specified source files by PRECOMPILE_HEADERS feature.
  function(qt_internal_extend_target target)
-@@ -36,6 +38,7 @@ function(qt_internal_extend_target target)
+@@ -40,6 +42,7 @@ function(qt_internal_extend_target target)
      )
      set(single_args
          PRECOMPILED_HEADER
@@ -53,10 +80,10 @@ index c712731f11..4d2072164e 100644
      )
      set(multi_args
          ${__default_public_args}
-@@ -233,6 +236,10 @@ function(qt_internal_extend_target target)
-     if(arg_NO_UNITY_BUILD)
-         set_target_properties(${target} PROPERTIES UNITY_BUILD OFF)
+@@ -241,6 +244,10 @@ function(qt_internal_extend_target target)
+             ${sources_property} "${arg_CONDITION_INDEPENDENT_SOURCES}")
      endif()
+ 
 +    if(arg_EXTRA_LINKER_SCRIPT_CONTENT)
 +        set_target_properties(${target} PROPERTIES
 +            _qt_extra_linker_script_content "${arg_EXTRA_LINKER_SCRIPT_CONTENT}")
@@ -65,10 +92,10 @@ index c712731f11..4d2072164e 100644
  
  function(qt_is_imported_target target out_var)
 diff --git a/src/corelib/CMakeLists.txt b/src/corelib/CMakeLists.txt
-index 1a8cc08de5..13dfad601d 100644
+index aeea45eaa0..3d3c26ab16 100644
 --- a/src/corelib/CMakeLists.txt
 +++ b/src/corelib/CMakeLists.txt
-@@ -1372,3 +1372,22 @@ if(APPLE AND QT_FEATURE_framework AND QT_FEATURE_separate_debug_info)
+@@ -1392,3 +1392,22 @@ if(APPLE AND QT_FEATURE_framework AND QT_FEATURE_separate_debug_info)
          DESTINATION "${dsym_script_install_dir}"
      )
  endif()
@@ -91,3 +118,6 @@ index 1a8cc08de5..13dfad601d 100644
 +qt_internal_extend_target(Core
 +    EXTRA_LINKER_SCRIPT_CONTENT "${linker_script_contents}"
 +)
+-- 
+2.41.0
+
