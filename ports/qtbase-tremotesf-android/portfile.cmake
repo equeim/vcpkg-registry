@@ -138,6 +138,7 @@ qt_install_submodule(
         -DFEATURE_mimetype_database=OFF
         -DFEATURE_networkdiskcache=OFF
         -DFEATURE_networklistmanager=OFF
+        -DFEATURE_permissions=OFF
         -DFEATURE_process=OFF
         -DFEATURE_processenvironment=OFF
         -DFEATURE_proxymodel=OFF
