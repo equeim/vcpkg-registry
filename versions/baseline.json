@@ -8,10 +8,6 @@
       "baseline": "5.240.0",
       "port-version": 0
     },
-    "qt5-tools": {
-      "baseline": "5.15.9",
-      "port-version": 0
-    },
     "qtbase-tremotesf-android": {
       "baseline": "6.5.1",
       "port-version": 1
