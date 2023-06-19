@@ -93,6 +93,7 @@ qt_install_submodule(
         ${QTBASE_PATCHES}
         # tremotesf-android patches
         qopensslbackend-static.patch
+        disable-openssl-in-core.patch
         0001-CMake-Fix-linkage-with-lld-16.0.patch
         0002-Don-t-run-version-script-test-when-its-result-won-t-.patch
         0003-Fix-version-script-test.patch
