@@ -1,8 +1,14 @@
+commit d65b2d73c833e8200eca10c74fa20bce3cb7e33b
+Author: Alexey Rochev <equeim@gmail.com>
+Date:   Thu Jun 1 00:25:38 2023 +0300
+
+    ECMDeprecationSettings: fix linking with static Qt
+
 diff --git a/modules/ECMDeprecationSettings.cmake b/modules/ECMDeprecationSettings.cmake
-index f7cd2b125074dcfbcc0a314ce72a5c9c3f8cccaa..c98182fc05aa6b78014a42a025d6720c185066d0 100644
+index 913e9aa9..527570c6 100644
 --- a/modules/ECMDeprecationSettings.cmake
 +++ b/modules/ECMDeprecationSettings.cmake
-@@ -64,6 +64,27 @@ function (ecm_set_disabled_deprecation_versions)
+@@ -63,6 +63,27 @@ function (ecm_set_disabled_deprecation_versions)
          set(show_newer_warnings FALSE)
      endif()
  
@@ -30,22 +36,36 @@ index f7cd2b125074dcfbcc0a314ce72a5c9c3f8cccaa..c98182fc05aa6b78014a42a025d6720c
      list(LENGTH ARGS_UNPARSED_ARGUMENTS PAIR_COUNT)
      math(EXPR is_even_number "${PAIR_COUNT} % 2")
      if (NOT is_even_number EQUAL 0)
-@@ -77,24 +98,29 @@ function (ecm_set_disabled_deprecation_versions)
+@@ -76,24 +97,42 @@ function (ecm_set_disabled_deprecation_versions)
          math(EXPR next_index "(${it} *2) + 1")
          list(GET ARGS_UNPARSED_ARGUMENTS ${next_index} DEPRECATION_VERSION)
  
 -        # get the string identifier for the target definition
          string(COMPARE EQUAL ${DEPRECATION_NAME} "QT" IS_QT_DEPRECATION)
--        if (IS_QT_DEPRECATION)
++
+         if (IS_QT_DEPRECATION)
 -            set(DEPRECATION_DEFINITION_NAME QT_DISABLE_DEPRECATED_BEFORE)
--        else()
++            set(add_disable_deprecated "${add_qt_disable_deprecated}")
++            if (NOT add_qt_disable_deprecated)
++                message(
++                    WARNING
++"Not adding QT_DISABLE_DEPRECATED_BEFORE definition when building against static Qt.
++Value of this definition must be the same for static Qt itself and for code that uses it, otherwise linking errors may occur.
++We don't know what value was used when building this version of Qt but the default is not to set any, so we that's what we are doing too"
++                )
++            endif()
+         else()
 -            set(DEPRECATION_DEFINITION_NAME ${DEPRECATION_NAME}_DISABLE_DEPRECATED_BEFORE_AND_AT)
 -        endif()
 -        # we want to be able to set this version without being forced to edit the CMakeLists.txt file
 -        if (${${DEPRECATION_DEFINITION_NAME}})
 -            set(DEPRECATION_VERSION "${${DEPRECATION_DEFINITION_NAME}}")
--        endif()
-+        if ((NOT IS_QT_DEPRECATION) OR add_qt_disable_deprecated)
++            set(add_disable_deprecated TRUE)
+         endif()
+ 
+-        # make a sanity check to make sure we do not get malformed versions
+-        _ecm_version_triple_sanity_check("${DEPRECATION_VERSION}")
++        if (add_disable_deprecated)
 +            # get the string identifier for the target definition
 +            if (IS_QT_DEPRECATION)
 +                set(DEPRECATION_DEFINITION_NAME QT_DISABLE_DEPRECATED_BEFORE)
@@ -58,19 +78,15 @@ index f7cd2b125074dcfbcc0a314ce72a5c9c3f8cccaa..c98182fc05aa6b78014a42a025d6720c
 +                set(DEPRECATION_VERSION "${${DEPRECATION_DEFINITION_NAME}}")
 +            endif()
  
--        # make a sanity check to make sure we do not get malformed versions
--        _ecm_version_triple_sanity_check("${DEPRECATION_VERSION}")
-+            # make a sanity check to make sure we do not get malformed versions
-+            _ecm_version_triple_sanity_check("${DEPRECATION_VERSION}")
- 
 -        # add the actual compile definition with the given hex value
 -        _ecm_geh_generate_hex_number_from_version(DEPRECATION_HEX_VERSION ${DEPRECATION_VERSION})
 -        add_definitions(-D${DEPRECATION_DEFINITION_NAME}=${DEPRECATION_HEX_VERSION})
++            # make a sanity check to make sure we do not get malformed versions
++            _ecm_version_triple_sanity_check("${DEPRECATION_VERSION}")
++
 +            # add the actual compile definition with the given hex value
 +            _ecm_geh_generate_hex_number_from_version(DEPRECATION_HEX_VERSION ${DEPRECATION_VERSION})
 +            add_definitions(-D${DEPRECATION_DEFINITION_NAME}=${DEPRECATION_HEX_VERSION})
-+        else()
-+            message(STATUS "Not adding QT_DISABLE_DEPRECATED_BEFORE definition with static Qt build")
 +        endif()
  
          # Set the version for the deprecation warnings
