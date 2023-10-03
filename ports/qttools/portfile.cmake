@@ -2,7 +2,7 @@ set(SCRIPT_PATH "${CURRENT_INSTALLED_DIR}/share/qtbase")
 include("${SCRIPT_PATH}/qt_install_submodule.cmake")
 
 set(${PORT}_PATCHES
-    disable-litehtml.patch)
+    devendor-litehtml.patch)
 
 #TODO check features and setup: (means force features!)
 
