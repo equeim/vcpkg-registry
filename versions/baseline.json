@@ -1,11 +1,11 @@
 {
   "default": {
     "kf6ecm": {
-      "baseline": "5.246.1",
+      "baseline": "6.4.0",
       "port-version": 0
     },
     "kf6widgetsaddons": {
-      "baseline": "5.246.0",
+      "baseline": "6.4.0",
       "port-version": 0
     },
     "qtbase-tremotesf-android": {

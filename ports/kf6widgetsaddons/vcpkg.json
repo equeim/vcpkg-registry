@@ -1,7 +1,6 @@
 {
   "name": "kf6widgetsaddons",
-  "version": "5.246.0",
-  "port-version": 0,
+  "version": "6.4.0",
   "description": "Addons to QtWidgets",
   "homepage": "https://api.kde.org/frameworks/kwidgetsaddons/html/index.html",
   "dependencies": [
@@ -9,12 +8,14 @@
     {
       "name": "qtbase",
       "default-features": false,
-      "features": ["widgets"]
+      "features": [
+        "widgets"
+      ]
     },
     {
       "name": "qttools",
-      "default-features": false,
-      "host": true
+      "host": true,
+      "default-features": false
     },
     {
       "name": "vcpkg-cmake",
