@@ -1,10 +1,9 @@
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO KDE/kwidgetsaddons
-    REF v6.4.0
-    SHA512 f49894f7e063f6fdcf50bf38fab5fd9c9530d906e0ebeb23a1fef7108eb619d2dc0181e41f9f1e780c7b7d342f58ab910b0c68f6b723cfd091c4184d2aa4d7d3
+    REF v6.7.0
+    SHA512 02614ec09412a1ab043cc355a1dad28a2cb9a8199868d5fb4b45ab736881a7740dc7fff790c7f3ead93ed8916632edd265226d6d65593c8480f1d8549f42761e
     HEAD_REF master
-    PATCHES fix-static-build.patch
 )
 
 # Prevent KDEClangFormat from writing to source effectively blocking parallel configure

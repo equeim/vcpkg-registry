@@ -1,6 +1,6 @@
 {
   "name": "kf6widgetsaddons",
-  "version": "6.4.0",
+  "version": "6.7.0",
   "description": "Addons to QtWidgets",
   "homepage": "https://api.kde.org/frameworks/kwidgetsaddons/html/index.html",
   "dependencies": [
@@ -9,6 +9,8 @@
       "name": "qtbase",
       "default-features": false,
       "features": [
+        "concurrent",
+        "thread",
         "widgets"
       ]
     },
