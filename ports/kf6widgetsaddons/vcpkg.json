@@ -1,6 +1,6 @@
 {
   "name": "kf6widgetsaddons",
-  "version": "6.11.0",
+  "version": "6.12.0",
   "description": "Addons to QtWidgets",
   "homepage": "https://api.kde.org/frameworks/kwidgetsaddons/html/index.html",
   "dependencies": [
