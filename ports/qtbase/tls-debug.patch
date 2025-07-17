@@ -1,0 +1,22 @@
+--- a/src/network/ssl/qsslsocket.cpp
++++ b/src/network/ssl/qsslsocket.cpp
+@@ -3,7 +3,7 @@
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+ 
+ 
+-//#define QSSLSOCKET_DEBUG
++#define QSSLSOCKET_DEBUG
+ 
+ /*!
+     \class QSslSocket
+--- a/src/plugins/tls/schannel/qtls_schannel.cpp
++++ b/src/plugins/tls/schannel/qtls_schannel.cpp
+@@ -1,7 +1,7 @@
+ // Copyright (C) 2021 The Qt Company Ltd.
+ // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+ 
+-// #define QSSLSOCKET_DEBUG
++#define QSSLSOCKET_DEBUG
+ 
+ #include "qtlsbackend_schannel_p.h"
+ #include "qtlskey_schannel_p.h"

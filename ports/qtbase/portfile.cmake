@@ -24,6 +24,7 @@ set(${PORT}_PATCHES
         fix-link-lib-discovery.patch
         macdeployqt-symlinks.patch
         fix-qicon-scale.patch
+        tls-debug.patch
 )
  
 if(VCPKG_TARGET_IS_WINDOWS AND NOT VCPKG_TARGET_IS_MINGW)

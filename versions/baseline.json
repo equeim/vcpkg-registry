@@ -10,7 +10,7 @@
     },
     "qtbase": {
       "baseline": "6.8.3",
-      "port-version": 0
+      "port-version": 1
     },
     "qtbase-tremotesf-android": {
       "baseline": "6.5.1",
