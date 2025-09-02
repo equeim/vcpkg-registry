@@ -1,8 +1,8 @@
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO KDE/extra-cmake-modules
-    REF v6.12.0
-    SHA512 835dd3fae1d67b2993be23ea263225edff08db7043938b373b8deffaad370340e346885037c4d2b0879c160cda1552a16ab3680655a682d8a384e57c86f0e848
+    REF v6.17.0
+    SHA512 8305e02b0e2be2777149479d79dd45b1cdb6dbb1a5d0a6a1ba8c8f12e015928ef387737243d707a405eead67893974a7dede78fde13e04850e993db854d0c1dd
     HEAD_REF master
     PATCHES d65b2d73c833e8200eca10c74fa20bce3cb7e33b.patch fix-relative-paths.patch
 )
