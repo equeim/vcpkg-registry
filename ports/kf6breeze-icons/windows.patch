@@ -1,0 +1,38 @@
+--- a/tools/generate-symbolic-dark.cpp
++++ b/tools/generate-symbolic-dark.cpp
+@@ -14,6 +14,10 @@
+ #include <QXmlStreamReader>
+ #include <QXmlStreamWriter>
+ 
++#ifdef Q_OS_WINDOWS
++#include <QProcess>
++#endif
++
+ using namespace Qt::StringLiterals;
+ using QRE = QRegularExpression;
+ 
+@@ -131,7 +135,24 @@
+ 
+             // keep symlinks
+             if (inputFileInfo.isSymLink()) {
++#ifdef Q_OS_WINDOWS
++                const int code = QProcess::execute("mklink.exe"_L1, {outputFilePath, inputFileInfo.absoluteDir().relativeFilePath(inputFileInfo.symLinkTarget())});
++                switch (code) {
++                case -2:
++                    qWarning() << "Failed to start mklink.exe";
++                    break;
++                case -1:
++                    qWarning() << "mklink.exe crashed";
++                    break;
++                default:
++                    if (code != 0) {
++                        qWarning() << "mklink.exe exited with code" << code;
++                    }
++                    break;
++                }
++#else
+                 QFile::link(inputFileInfo.absoluteDir().relativeFilePath(inputFileInfo.symLinkTarget()), outputFilePath);
++#endif
+                 continue;
+             }
+ 

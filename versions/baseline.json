@@ -1,5 +1,9 @@
 {
   "default": {
+    "kf6breeze-icons": {
+      "baseline": "6.20.0",
+      "port-version": 0
+    },
     "kf6ecm": {
       "baseline": "6.20.0",
       "port-version": 0
