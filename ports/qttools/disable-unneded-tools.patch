@@ -1,0 +1,37 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 3589a35b0..a6b884350 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -17,11 +17,6 @@ qt_exclude_tool_directories_from_default_target(
+ # The config files will be written in the src/global module.
+ qt_feature_evaluate_features("${CMAKE_CURRENT_SOURCE_DIR}/../configure.cmake")
+ 
+-if(TARGET Qt::Widgets)
+-    add_subdirectory(uiplugin)
+-    add_subdirectory(uitools)
+-endif()
+-
+ add_subdirectory(global) # special case add as first directory
+ if(QT_FEATURE_linguist)
+     add_subdirectory(linguist)
+diff --git a/src/linguist/CMakeLists.txt b/src/linguist/CMakeLists.txt
+index 1686f470e..a59d51257 100644
+--- a/src/linguist/CMakeLists.txt
++++ b/src/linguist/CMakeLists.txt
+@@ -9,16 +9,8 @@ if(NOT QT_FEATURE_linguist)
+     return()
+ endif()
+ add_subdirectory(lconvert)
+-add_subdirectory(lprodump)
+ add_subdirectory(lrelease)
+-add_subdirectory(lrelease-pro)
+ add_subdirectory(lupdate)
+-add_subdirectory(lupdate-pro)
+-if(QT_FEATURE_process AND QT_FEATURE_pushbutton AND QT_FEATURE_toolbutton
+-    AND QT_FEATURE_png AND QT_FEATURE_mdiarea AND QT_FEATURE_syntaxhighlighter
+-    AND TARGET Qt::Widgets)
+-    add_subdirectory(linguist)
+-endif()
+ 
+ # Create a fake module that would emulate the Qt5::LinguistTools CMake Config package
+ qt_internal_add_module(Linguist

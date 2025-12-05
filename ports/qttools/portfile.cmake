@@ -3,6 +3,7 @@ include("${SCRIPT_PATH}/qt_install_submodule.cmake")
 
 set(${PORT}_PATCHES
     devendor-litehtml.patch
+    disable-unneded-tools.patch
   )
 
 #TODO check features and setup: (means force features!)
@@ -95,6 +96,11 @@ qt_install_submodule(PATCHES    ${${PORT}_PATCHES}
                            -DCMAKE_DISABLE_FIND_PACKAGE_Qt6AxContainer=ON
                            -DQLITEHTML_USE_SYSTEM_LITEHTML:BOOL=ON
                            -DCMAKE_REQUIRE_FIND_PACKAGE_litehtml:BOOL=ON
+                           -DFEATURE_pixeltool=OFF
+                           -DFEATURE_qtattributionsscanner=OFF
+                           -DFEATURE_qtdiag=OFF
+                           -DFEATURE_qtplugininfo=OFF
+
                      CONFIGURE_OPTIONS_MAYBE_UNUSED
                             ${unused}
                     )
