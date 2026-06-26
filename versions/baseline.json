@@ -1,13 +1,5 @@
 {
   "default": {
-    "kf6ecm": {
-      "baseline": "6.20.0",
-      "port-version": 0
-    },
-    "kf6widgetsaddons": {
-      "baseline": "6.20.0",
-      "port-version": 0
-    },
     "qttools": {
       "baseline": "6.9.3",
       "port-version": 0
