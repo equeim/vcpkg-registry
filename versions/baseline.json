@@ -1,7 +1,7 @@
 {
   "default": {
     "qttools": {
-      "baseline": "6.11.1",
+      "baseline": "6.11.2",
       "port-version": 0
     },
     "shared-mime-info": {
